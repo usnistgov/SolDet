@@ -1,0 +1,16 @@
+README.md
+setup.py
+soldet/SolitonDetector.py
+soldet/__init__.py
+soldet/classifier.py
+soldet/data_download.py
+soldet/dataset.py
+soldet/mhat_metric.py
+soldet/object_detector.py
+soldet/pipeline.py
+soldet/tf_helper.py
+soldet.egg-info/PKG-INFO
+soldet.egg-info/SOURCES.txt
+soldet.egg-info/dependency_links.txt
+soldet.egg-info/requires.txt
+soldet.egg-info/top_level.txt
