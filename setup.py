@@ -16,7 +16,7 @@ setup(
         'numpy == 1.19.2',
         'scikit-learn==0.23.1',
         'scipy==1.6.3',
-        'tensorflow==2.5.0',
+        'tensorflow==2.5.3',
         'tqdm==4.47.0',
         'matplotlib==3.2.2',
         'lmfit==1.0.1',
