@@ -1,7 +1,9 @@
 # SolDet
-SolDet is an object oriented package for solitonic fearture detection in absorption images of Bose Einstein condensate. with wider use for cold atom image analysis. Featured with classifier, object detector and Mexican hat metric methods. Technical details are explained in https://arxiv.org/abs/2111.04881.
+SolDet is an object-oriented package for solitonic fearture detection in absorption images of Bose-Einstein condensates, with wider use for cold atom image analysis. 
+It is featured with classifier, object detector, and Mexican hat metric methods. 
+Technical details are explained in https://arxiv.org/abs/2111.04881.
 
-The dataset used to prepare SolDet is currently being prepared for public release. Until then, it can be requested from Justyna Zwolak (jpzwolak@nist.gov).
+The dataset used to prepare SolDet is currently being prepared for public release. Until then, it can be requested from [Justyna Zwolak](jpzwolak@nist.gov).
 Note that SolDet assumes the following folder structure for the data files:
 
 ```
@@ -50,12 +52,12 @@ sd = SolitonDetector()
 
 To import labeled dataset, use `load_data` method:
 ```
-sd.load_data(directory=directory_str', data_key={'train':0.9, 'test':0.1}, data_type='labeled') 
+sd.load_data(directory='directory_str', data_key={'train':0.9, 'test':0.1}, data_type='labeled') 
 ```
 
 To import unlabeled dataset, use
 ```
-sd.load_data(directory=directory_str', data_key='new', data_type='unlabeled') 
+sd.load_data(directory='directory_str', data_key='new', data_type='unlabeled') 
 ```
 
 ## Train models
@@ -66,11 +68,12 @@ sd.train_ML(model_key='object_detector', data_key='train', save=save_str)
 ```
 where `model_key` can be `'object_detector'` or `'classifier'`.
 
-To train an physics-based model, use `define_PIE_classifier` method:
+To train the physics-based model, use `define_PIE_classifier` method:
 ```
 sd.define_PIE_classifier(data_key='train', save=save_str)
 ```
-to define a phycics-informed exictiation (PIE) classifier. Or use `train_quality_estimator` method:
+to define a phycics-informed exictiation (PIE) classifier. 
+Use `train_quality_estimator` method:
 ```
 sd.train_quality_estimator(data_key='train', save=save_str) 
 ```
