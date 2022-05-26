@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this repository or present information about it publicly, please cite it as below."
+authors:
+- family-names: "Guo"
+  given-names: "Shangjie"
+  orcid: "https://orcid.org/0000-0002-6910-636X"
+- family-names: "Koh"
+  given-names: "Sophia M."
+  orcid: "https://orcid.org/0000-0001-5481-0285"
+- family-names: "Fritsch"
+  given-names: "Amilson R."
+  orcid: "https://orcid.org/0000-0003-1419-8591"
+- family-names: "Spielman"
+  given-names: "Ian B."
+  orcid: "https://orcid.org/0000-0003-1421-8652"
+- family-names: "Zwolak"
+  given-names: "Justyna P."
+  orcid: "https://orcid.org/0000-0002-2286-3208"
+title: "SolDet: Solitonic feature detection package"
+version: 1.0.0
+doi: 10.18434/mds2-2641
+date-released: 2022-05-10
+url: "https://github.com/usnistgov/SolDet"
