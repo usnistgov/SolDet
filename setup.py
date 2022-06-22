@@ -13,7 +13,7 @@ setup(
     packages=['soldet'],
     long_description=open('README.md').read(),
     install_requires = [
-        'numpy == 1.21.0',
+        'numpy == 1.22.0',
         'scikit-learn==0.23.1',
         'scipy==1.6.3',
         'tensorflow==2.7.2',
