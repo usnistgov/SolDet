@@ -8,6 +8,7 @@ Created on Sat May 29 16:10:53 2021
 """
 
 import os
+import sys
 import glob
 # import h5py
 from tqdm import tqdm
@@ -16,6 +17,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from soldet.mhat_metric import fit_tf_1D_from_image, fit_soliton
+from pathlib import Path
 
 import matplotlib
 # plt.style.use('matplotlibrc')
@@ -87,30 +89,30 @@ def get_data(directory, **data_params):
     else:
         return_types = False
     
-    if 'Ian_label' in data_params:
-        Ian_label = data_params['Ian_label']
-    else:
-        Ian_label = True
+    # if 'Ian_label' in data_params:
+    #     Ian_label = data_params['Ian_label']
+    # else:
+    #     Ian_label = True
     
     if 'mask' in data_params:
         mask = data_params['mask']
     else: 
         mask = True
         
-    if 'batch' in data_params:
-        batch = data_params['batch']
-    else:
-        batch=[1,2,3,4,5,6,7,8]
+    # if 'batch' in data_params:
+    #     batch = data_params['batch']
+    # else:
+    #     batch=[1,2,3,4,5,6,7,8]
         
-    if 'return_SGJZ_labels' in data_params:
-        return_SGJZ_labels = data_params['return_SGJZ_labels']
-    else:
-        return_SGJZ_labels = False
+    # if 'return_SGJZ_labels' in data_params:
+    #     return_SGJZ_labels = data_params['return_SGJZ_labels']
+    # else:
+    #     return_SGJZ_labels = False
     
-    if 'return_SGJZ_flags' in data_params:
-        return_SGJZ_flags = data_params['return_SGJZ_flags']
-    else:
-        return_SGJZ_flags = False
+    # if 'return_SGJZ_flags' in data_params:
+    #     return_SGJZ_flags = data_params['return_SGJZ_flags']
+    # else:
+    #     return_SGJZ_flags = False
         
     if 'return_metadata' in data_params:
         return_metadata = data_params['return_metadata']
@@ -148,13 +150,39 @@ def get_data(directory, **data_params):
     if 'cwd' in data_params:
         cwd = data_params['cwd']
     else:
-        cwd = True
+        cwd = False
     
-    # Start
-    if cwd:
-        files = glob.glob(os.getcwd()+ directory + "*.npy")
-    else:
-        files = glob.glob(directory + "*.npy")
+    
+    if return_labels:
+        if 'labels_directory' in data_params:
+            labels_directory = data_params['labels_directory']
+        else:
+            nb_dir = os.path.split(os.getcwd())[0]
+            if nb_dir not in sys.path:
+                sys.path.append(nb_dir)
+            labels_directory = nb_dir + '/data/data_info/data_roster.npy'
+            
+        # Start
+        if cwd:
+            labels_file = os.getcwd()+ labels_directory
+        else:
+            labels_file = labels_directory
+        
+        labels_dict = np.load(labels_file, allow_pickle=True).item()
+    
+    if type(directory)==str:
+        if cwd:
+            files = glob.glob(os.getcwd()+ directory + "*.npy")
+        else:
+            files = glob.glob(directory + "*.npy")
+            
+    elif type(directory)==list:
+        files = []
+        for d in directory:
+            if cwd:
+                files += glob.glob(os.getcwd()+ d + "*.npy")
+            else:
+                files += glob.glob(d + "*.npy")
     
     if if_shuffle:
         random.Random(seed).shuffle(files)
@@ -175,13 +203,13 @@ def get_data(directory, **data_params):
     if return_types:
         types_list = []
     
-    if return_SGJZ_labels:
-        oup1 = []
-        oup2 = []
+    # if return_SGJZ_labels:
+    #     oup1 = []
+    #     oup2 = []
         
-    if return_SGJZ_flags:
-        oup3 = []
-        oup4 = []
+    # if return_SGJZ_flags:
+    #     oup3 = []
+    #     oup4 = []
     if return_cloudinfo:
         cloud_info_list = []
     if return_metadata:
@@ -191,44 +219,60 @@ def get_data(directory, **data_params):
     #     raw_data_list = []
     #     orientation='xy'
     
+    
     for file in tqdm(files[:datasize]):
-        data_dict = np.load(file, allow_pickle=True).item()
+        data_dict = np.load(Path(file.replace('\\','/')), allow_pickle=True).item()
+        
         if mask:
             inp += [data_dict['masked_data'].reshape(132,164,1)]
         else:    
             inp += [data_dict['cloud_data'].reshape(132,164,1)] # generates a list of arrays
             
-        if return_labels and (data_dict['label_batch_num'] in batch):
-            if 'label' not in data_dict:
+        if return_labels:
+            data_dict.update(labels_dict[file[file.find('SolDet/data')+6:].replace('\\', '/')])
+            if 'label_v3' in data_dict:
+                oup += [data_dict['label_v3']]
+            else:
                 print('data ('+file+') is unlabeled, use return_labels=False to get data only.')
                 return
-                
-            if Ian_label:
-                oup += [data_dict['label']] # generates a list of arrays
-            else:
-                if 'label_AF' in data_dict:
-                    oup += [data_dict['label_AF']]
-                else:
-                    oup += [data_dict['label']]
-            if return_SGJZ_labels:
-                oup1 += [data_dict['label_SG']]
-                oup2 += [data_dict['label_JZ']]
-            if return_SGJZ_flags:
-                if 'question_flag_SG' in data_dict:
-                    oup3.append(1)
-                else:
-                    oup3.append(0)
         
-                if 'question_flag_JZ' in data_dict:
-                    oup4.append(1)
-                else:
-                    oup4.append(0)
+        # if return_labels and (data_dict['label_batch_num'] in batch):
+        #     if Ian_label:
+        #         oup += [data_dict['label']] # generates a list of arrays
+        #     else:
+        #         if 'label_AF' in data_dict:
+        #             oup += [data_dict['label_AF']]
+        #         else:
+        #             oup += [data_dict['label']]
+        #     if return_SGJZ_labels:
+        #         oup1 += [data_dict['label_SG']]
+        #         oup2 += [data_dict['label_JZ']]
+        #     if return_SGJZ_flags:
+        #         if 'question_flag_SG' in data_dict:
+        #             oup3.append(1)
+        #         else:
+        #             oup3.append(0)
+        
+        #         if 'question_flag_JZ' in data_dict:
+        #             oup4.append(1)
+        #         else:
+        #             oup4.append(0)
         
         if return_positions:
-            positions_list.append(data_dict['positions'])
+            if 'excitation_position' in data_dict:
+                positions_list.append(data_dict['excitation_position'])
+            elif data_dict['label_v3'] == 0:
+                positions_list.append([])
+            else:
+                positions_list.append('')
         
         if return_types:
-            types_list.append(data_dict['types'])
+            if 'excitation_PIE' in data_dict:
+                types_list.append(data_dict['excitation_PIE'])
+            elif data_dict['label_v3'] == 0:
+                types_list.append([])
+            else:
+                types_list.append('')
             
         if return_cloudinfo:
             cloud_info_list.append(data_dict['fitted_parameters'])
@@ -263,17 +307,17 @@ def get_data(directory, **data_params):
     if return_types:
         res.append(types_list)
     
-    if return_SGJZ_labels:
-        labelsSG_list = np.array(oup1)
-        labelsJZ_list = np.array(oup2)
-        res.append(labelsSG_list)
-        res.append(labelsJZ_list)
+    # if return_SGJZ_labels:
+    #     labelsSG_list = np.array(oup1)
+    #     labelsJZ_list = np.array(oup2)
+    #     res.append(labelsSG_list)
+    #     res.append(labelsJZ_list)
     
-    if return_SGJZ_flags:
-        flagsSG_list = np.array(oup3)
-        flagsJZ_list = np.array(oup4)
-        res.append(flagsSG_list)
-        res.append(flagsJZ_list)
+    # if return_SGJZ_flags:
+    #     flagsSG_list = np.array(oup3)
+    #     flagsJZ_list = np.array(oup4)
+    #     res.append(flagsSG_list)
+    #     res.append(flagsJZ_list)
     
     if return_cloudinfo:
         res.append(cloud_info_list)
